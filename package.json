@@ -1,0 +1,80 @@
+{
+  "name": "@golom/sdk",
+  "version": "0.1.0",
+  "main": "dist/src/index.cjs.js",
+  "module": "dist/src/index.esm.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "keywords": [
+    "golom",
+    "sdk",
+    "typescript"
+  ],
+  "homepage": "https://golom.io/",
+  "bugs": "https://github.com/golom-protocol/golom-sdk/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/golom-protocol/golom-sdk.git"
+  },
+  "author": "Elrond <elrond@golom.io>",
+  "license": "MIT",
+  "description": "An SDK to interact with golom's smart contract.",
+  "scripts": {
+    "prebuild": "rm -rf ./dist",
+    "prepublishOnly": "yarn build",
+    "build": "yarn generate && rollup -c && tsc -d",
+    "dev": "rollup -c -w",
+    "generate": "rm -rf ./abis && typechain --target=ethers-v5 'src/abis/**/*.json' --out-dir 'abis/types'",
+    "test": "jest --runInBand",
+    "coverage": "jest --runInBand",
+    "lint": "npm run lint:json && npm run lint:ts",
+    "lint:json": "prettier --list-different .eslintrc *.json",
+    "lint:ts": "eslint --ext .js,.ts --ignore-path .gitignore ."
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.10",
+    "@babel/preset-env": "^7.17.10",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-typescript": "^8.3.2",
+    "@types/jest": "^27.5.0",
+    "@typescript-eslint/eslint-plugin": "^2.2.0",
+    "@typescript-eslint/parser": "^2.2.0",
+    "dotenv": "^16.0.1",
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-prettier": "^3.1.0",
+    "jest": "^28.1.0",
+    "prettier": "^1.18.2",
+    "rollup": "^2.72.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "ts-jest": "^28.0.2",
+    "tslib": "^2.4.0",
+    "typescript": "^4.3.0"
+  },
+  "dependencies": {
+    "@ethersproject/abstract-signer": "^5.6.2",
+    "@ethersproject/address": "^5.6.0",
+    "@ethersproject/bignumber": "^5.6.0",
+    "@ethersproject/bytes": "^5.6.1",
+    "@ethersproject/constants": "^5.6.0",
+    "@ethersproject/contracts": "^5.6.2",
+    "@ethersproject/providers": "^5.6.5",
+    "@ethersproject/wallet": "^5.6.2",
+    "@typechain/ethers-v5": "^10.0.0",
+    "ethereumjs-util": "^7.1.4",
+    "ethers": "^5.6.8",
+    "global": "^4.4.0",
+    "typechain": "^8.0.0"
+  }
+}
