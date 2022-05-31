@@ -45,25 +45,25 @@ export async function createOrder(
 
   const order = {
     collection: asset.collection,
-    tokenId: asset.tokenId.toString(),
+    tokenId: Number(asset.tokenId),
     signer: accountAddress,
-    orderType: orderType.toString(),
-    totalAmt: listingPrice.toString(),
+    orderType,
+    totalAmt: Number(listingPrice),
     exchange: {
-      paymentAmt: computeFees(BigNumber.from(exchangeFeeBasis), BigNumber.from(listingPrice)).toString(),
+      paymentAmt: Number(computeFees(BigNumber.from(exchangeFeeBasis), BigNumber.from(listingPrice))),
       paymentAddress: EXCHANGE_FEE_ADDRESS
     },
     prePayment: {
-      paymentAmt: computeFees(BigNumber.from(royaltyFeeBasis), BigNumber.from(listingPrice)).toString(),
+      paymentAmt: Number(computeFees(BigNumber.from(royaltyFeeBasis), BigNumber.from(listingPrice))),
       paymentAddress: royaltyAddress ?? EXCHANGE_FEE_ADDRESS
     },
     isERC721: asset.schema === 'ERC721',
-    tokenAmt: quantity?.toString() ?? One.toString(),
-    refererrAmt: computeFees(BigNumber.from(refererrFeeBasis), BigNumber.from(listingPrice)).toString(),
+    tokenAmt: Number(quantity) ?? Number(One),
+    refererrAmt: Number(computeFees(BigNumber.from(refererrFeeBasis), BigNumber.from(listingPrice))),
     root: traitRoot,
     reservedAddress: AddressZero,
-    nonce: nonce.toString(),
-    deadline: deadline.toString()
+    nonce: Number(nonce),
+    deadline: Number(deadline)
   }
 
   const ecSignature = await signTypedDataAsync(signer.provider, order, accountAddress)
@@ -187,6 +187,7 @@ async function validateAskOrder({
  *
  * @param {FillOrderParams} params FillOrder params
  * @param signer Signer object to sign the transaction
+ * @param overrides Additional transaction params
  * @returns {TransactionResponse} Transaction response
  */
 export async function fillOrder(
@@ -200,7 +201,8 @@ export async function fillOrder(
       paymentAddress: AddressZero
     }
   }: FillOrderParams,
-  signer: JsonRpcSigner
+  signer: JsonRpcSigner,
+  overrides: Overrides = {}
 ): Promise<TransactionResponse | undefined> {
   const exchangeContract = getExchangeContract(GOLOM_EXCHANGE, signer)
   const accountAddress = await signer.getAddress()
@@ -237,7 +239,10 @@ export async function fillOrder(
     })
 
     if (isValidBid) {
-      return exchangeContract.fillBid(order, quantity, refererrAddress, postPayment, { from: accountAddress })
+      return exchangeContract.fillBid(order, quantity, refererrAddress, postPayment, {
+        ...overrides,
+        from: accountAddress
+      })
     }
   } else {
     const isValidAsk = await validateAskOrder({
@@ -248,6 +253,7 @@ export async function fillOrder(
 
     if (isValidAsk) {
       return exchangeContract.fillAsk(order, quantity, refererrAddress, postPayment, {
+        ...overrides,
         from: accountAddress,
         value: BigNumber.from(order.totalAmt)
       })
@@ -260,6 +266,7 @@ export async function fillOrder(
  *
  * @param {FillCriteriaBidParams} params FillCriteriaBid params
  * @param signer Signer object to sign the transaction
+ * @param overrides Additional transaction params
  * @returns {TransactionResponse} Transaction response
  */
 export async function fillCriteriaBid(
@@ -274,7 +281,8 @@ export async function fillCriteriaBid(
       paymentAddress: AddressZero
     }
   }: FillCriteriaBidParams,
-  signer: JsonRpcSigner
+  signer: JsonRpcSigner,
+  overrides: Overrides = {}
 ): Promise<TransactionResponse | undefined> {
   const exchangeContract = getExchangeContract(GOLOM_EXCHANGE, signer)
   const accountAddress = await signer.getAddress()
@@ -303,6 +311,7 @@ export async function fillCriteriaBid(
 
   if (isValidBid) {
     return exchangeContract.fillCriteriaBid(order, quantity, tokenId, [traitRoot], refererrAddress, postPayment, {
+      ...overrides,
       from: accountAddress
     })
   }
