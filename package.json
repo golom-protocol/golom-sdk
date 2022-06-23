@@ -1,6 +1,6 @@
 {
   "name": "@golom/sdk",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "main": "dist/src/index.cjs.js",
   "module": "dist/src/index.esm.js",
   "types": "dist/src/index.d.ts",
