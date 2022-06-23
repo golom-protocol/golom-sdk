@@ -210,24 +210,7 @@ export async function fillOrder(
 
   try {
     orderResponse = await exchangeContract.validateOrder(order)
-    if (!orderResponse[0].eq(3)) {
-      return throwInvalidOrder({
-        orderHash: orderResponse[1],
-        type: `InvalidOrder`,
-        message: `Failed to validate sell order parameters. Make sure you're on the right network!`
-      })
-    }
-    if (orderResponse[2].lt(quantity)) {
-      return throwInvalidOrder({
-        orderHash: orderResponse[1],
-        type: `InvalidOrder`,
-        message: `Fill quantity can not be greater than the quantity available.`
-      })
-    }
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message)
-    }
     throw new Error(error as string)
   }
 
