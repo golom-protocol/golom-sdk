@@ -45,21 +45,21 @@ export async function createOrder(
 
   const order = {
     collection: asset.collection,
-    tokenId: Number(asset.tokenId),
+    tokenId: asset.tokenId.toString(),
     signer: accountAddress,
     orderType,
-    totalAmt: Number(listingPrice),
+    totalAmt: listingPrice.toString(),
     exchange: {
-      paymentAmt: Number(computeFees(BigNumber.from(exchangeFeeBasis), BigNumber.from(listingPrice))),
+      paymentAmt: computeFees(BigNumber.from(exchangeFeeBasis), BigNumber.from(listingPrice)).toString(),
       paymentAddress: EXCHANGE_FEE_ADDRESS
     },
     prePayment: {
-      paymentAmt: Number(computeFees(BigNumber.from(royaltyFeeBasis), BigNumber.from(listingPrice))),
+      paymentAmt: computeFees(BigNumber.from(royaltyFeeBasis), BigNumber.from(listingPrice)).toString(),
       paymentAddress: royaltyAddress ?? EXCHANGE_FEE_ADDRESS
     },
     isERC721: asset.schema === 'ERC721',
     tokenAmt: Number(quantity) ?? Number(One),
-    refererrAmt: Number(computeFees(BigNumber.from(refererrFeeBasis), BigNumber.from(listingPrice))),
+    refererrAmt: computeFees(BigNumber.from(refererrFeeBasis), BigNumber.from(listingPrice)).toString(),
     root: traitRoot,
     reservedAddress: AddressZero,
     nonce: Number(nonce),
@@ -273,17 +273,7 @@ export async function fillCriteriaBid(
 
   try {
     orderResponse = await exchangeContract.validateOrder(order)
-    if (!orderResponse[0].eq(3)) {
-      return throwInvalidOrder({
-        orderHash: orderResponse[1],
-        type: `InvalidOrder`,
-        message: `Failed to validate sell order parameters. Make sure you're on the right network!`
-      })
-    }
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message)
-    }
     throw new Error(error as string)
   }
   const isValidBid = await validateBidOrder({
