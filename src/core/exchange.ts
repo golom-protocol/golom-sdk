@@ -13,7 +13,6 @@ import { signTypedDataAsync } from './sign'
  *
  * @param {OrderParams} order Order params
  * @param signer Signer object to sign the transaction
- * @param offline Flag to generate signature offline; for nodes
  * @returns {SignedOrder} Signed Order
  */
 export async function createOrder(
