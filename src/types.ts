@@ -5,6 +5,7 @@ import { Provider } from '@ethersproject/providers'
 import { Molotrader } from '../abis/types/Exchange'
 
 export type SignerOrProvider = Signer | Provider
+export type SignedOrder = Molotrader.OrderStruct
 
 type Asset = {
   tokenId: BigNumberish
@@ -32,7 +33,7 @@ export type OrderParams = {
 }
 
 export type FillOrderParams = {
-  order: Molotrader.OrderStruct
+  order: SignedOrder
   tradeType?: TradeType
   quantity?: BigNumberish
   refererrAddress?: string
@@ -40,7 +41,7 @@ export type FillOrderParams = {
 }
 
 export type FillCriteriaBidParams = {
-  order: Molotrader.OrderStruct
+  order: SignedOrder
   tokenId: BigNumberish
   traitRoot?: string
   quantity?: BigNumberish

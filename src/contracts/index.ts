@@ -1,4 +1,6 @@
 import { getAddress } from '@ethersproject/address'
+import { Signer } from '@ethersproject/abstract-signer'
+// import { JsonRpcProvider } from '@ethersproject/providers'
 import { Weth } from '../../abis/types/tokens/Weth'
 import { Erc721 } from '../../abis/types/tokens/Erc721'
 import { Erc1155 } from '../../abis/types/tokens/Erc1155'
@@ -7,7 +9,9 @@ import {
   Erc721__factory as ERC721Factory,
   Erc1155__factory as ERC1155Factory,
   Weth__factory as WETHFactory,
-  Exchange
+  Emitter__factory as EmitterFactory,
+  Exchange,
+  Emitter
 } from '../../abis/types'
 
 import { SignerOrProvider } from '../types'
@@ -56,4 +60,15 @@ function getWethContract(address: string, signerOrProvider: SignerOrProvider): W
   return WETHFactory.connect(address, signerOrProvider)
 }
 
-export { getExchangeContract, getErc721Contract, getErc1155Contract, getWethContract }
+/**
+ *
+ * @param address Address of exchange
+ * @param signer Instance of polygon JsonRpcProvider or JsonRpcSigner
+ * @returns {Exchange} Exchange Contract
+ */
+function getEmitterContract(address: string, signer: Signer): Emitter {
+  getAddress(address)
+  return EmitterFactory.connect(address, signer)
+}
+
+export { getExchangeContract, getErc721Contract, getErc1155Contract, getWethContract, getEmitterContract }

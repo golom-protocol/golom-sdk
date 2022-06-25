@@ -1,4 +1,5 @@
 export * from './core/exchange'
+export * from './core/emitter'
 export * from './core/sign'
 export * from './core/sign/getCreateOrderTypedData'
 export * from './abis'

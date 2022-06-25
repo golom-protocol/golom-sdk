@@ -3,20 +3,17 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { AddressZero, One, Zero } from '@ethersproject/constants'
 import { JsonRpcProvider, JsonRpcSigner, TransactionResponse } from '@ethersproject/providers'
 
-import { FillCriteriaBidParams, FillOrderParams, OrderParams, TradeType } from '../types'
-import { Molotrader } from '../../abis/types/Exchange'
-
-import { getExchangeContract, getErc721Contract, getErc1155Contract, getWethContract } from '../contracts'
 import { DEFAULT_DEADLINE, EXCHANGE_FEE_ADDRESS, GOLOM_EXCHANGE, NULL_ROOT, WETH_CONTRACT } from '../constants'
-import { signTypedDataAsync } from './sign'
+import { getExchangeContract, getErc721Contract, getErc1155Contract, getWethContract } from '../contracts'
+import { FillCriteriaBidParams, FillOrderParams, OrderParams, SignedOrder, TradeType } from '../types'
 import { computeFees, throwInvalidOrder } from '../utils'
+import { signTypedDataAsync } from './sign'
 
 /**
  *
  * @param {OrderParams} order Order params
  * @param signer Signer object to sign the transaction
- * @param offline Flag to generate signature offline; for nodes
- * @returns {Molotrader.OrderStruct} Signed Order
+ * @returns {SignedOrder} Signed Order
  */
 export async function createOrder(
   {
@@ -28,11 +25,12 @@ export async function createOrder(
     royaltyFeeBasis = Zero,
     royaltyAddress = AddressZero,
     quantity = One,
+    reservedAddress = AddressZero,
     traitRoot = NULL_ROOT,
     deadline = DEFAULT_DEADLINE
   }: OrderParams,
   signer: JsonRpcSigner
-): Promise<Molotrader.OrderStruct | null> {
+): Promise<SignedOrder | null> {
   const exchangeContract = getExchangeContract(GOLOM_EXCHANGE, signer.provider)
   const accountAddress = await signer.getAddress()
   const nonce = await exchangeContract.nonces(accountAddress)
@@ -61,7 +59,7 @@ export async function createOrder(
     tokenAmt: Number(quantity) ?? Number(One),
     refererrAmt: computeFees(BigNumber.from(refererrFeeBasis), BigNumber.from(listingPrice)).toString(),
     root: traitRoot,
-    reservedAddress: AddressZero,
+    reservedAddress,
     nonce: Number(nonce),
     deadline: Number(deadline)
   }
@@ -90,13 +88,13 @@ export async function createOrder(
 
 /**
  *
- * @param {Molotrader.OrderStruct} order Signed Order
+ * @param {SignedOrder} order Signed Order
  * @param signer Signer object to sign the transaction
  * @param overrides Additional transaction params
  * @returns {TransactionResponse} Transaction response
  */
 export async function cancelOrder(
-  order: Molotrader.OrderStruct,
+  order: SignedOrder,
   signer: JsonRpcSigner,
   overrides: Overrides = {}
 ): Promise<TransactionResponse> {
@@ -109,7 +107,7 @@ async function validateBidOrder({
   provider,
   orderHash
 }: {
-  order: Molotrader.OrderStruct
+  order: SignedOrder
   provider: JsonRpcProvider
   orderHash: string
 }): Promise<Boolean> {
@@ -141,7 +139,7 @@ async function validateAskOrder({
   provider,
   orderHash
 }: {
-  order: Molotrader.OrderStruct
+  order: SignedOrder
   provider: JsonRpcProvider
   orderHash: string
 }): Promise<Boolean> {
