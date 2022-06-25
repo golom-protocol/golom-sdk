@@ -35,7 +35,7 @@ npm install @golom/sdk
 | param | type | 
 | -------- | -------- 
 | order     | [OrderParams](https://github.com/golom-protocol/golom-sdk/blob/main/src/types.ts#L20) 
-| signer     | [Signer](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) 
+| signer     | [JsonRpcSigner](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) 
 
 
 ```typescript
@@ -63,7 +63,7 @@ let order = await createOrder(
 | param | type | default | required
 | -------- | -------- | -------- | --------
 | orderParams     | [FillOrderParams](https://github.com/golom-protocol/golom-sdk/blob/main/src/types.ts#L34) ||true
-| signer     | [Signer](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
+| signer     | [JsonRpcSigner](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
 | overrides     | [Overrides](https://github.com/ethers-io/ethers.js/blob/master/packages/contracts/src.ts/index.ts#L17) | `{}` | false
 
 ```typescript
@@ -85,7 +85,7 @@ await fillOrder(
 | param | type | default | required
 | -------- | -------- | -------- | --------
 | orderParams     | [FillCriteriaBidParams](https://github.com/golom-protocol/golom-sdk/blob/main/src/types.ts#L42) ||true
-| signer     | [Signer](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
+| signer     | [JsonRpcSigner](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
 | overrides     | [Overrides](https://github.com/ethers-io/ethers.js/blob/master/packages/contracts/src.ts/index.ts#L17) | `{}` | false
 
 
@@ -111,7 +111,7 @@ await fillCriteriaBid(
 | param | type | default | required
 | -------- | -------- | -------- | --------
 | order     | [SignedOrder](#SignedOrder) ||true
-| signer     | [Signer](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
+| signer     | [JsonRpcSigner](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
 | overrides     | [Overrides](https://github.com/ethers-io/ethers.js/blob/master/packages/contracts/src.ts/index.ts#L17) | `{}` | false
 
 
@@ -137,7 +137,7 @@ Emits signed order to polygon blockchain.
 | param | type | default | required
 | -------- | -------- | -------- | --------
 | order     | [SignedOrder](#SignedOrder) ||true
-| signer     | [Signer](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
+| signer     | [JsonRpcSigner](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
 | overrides     | [Overrides](https://github.com/ethers-io/ethers.js/blob/master/packages/contracts/src.ts/index.ts#L17) | `{}` | false
 
 ```typescript
