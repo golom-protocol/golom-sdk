@@ -1,6 +1,6 @@
 import { getAddress } from '@ethersproject/address'
 import { Signer } from '@ethersproject/abstract-signer'
-import { JsonRpcProvider } from '@ethersproject/providers'
+// import { JsonRpcProvider } from '@ethersproject/providers'
 import { Weth } from '../../abis/types/tokens/Weth'
 import { Erc721 } from '../../abis/types/tokens/Erc721'
 import { Erc1155 } from '../../abis/types/tokens/Erc1155'
@@ -68,8 +68,6 @@ function getWethContract(address: string, signerOrProvider: SignerOrProvider): W
  */
 function getEmitterContract(address: string, signer: Signer): Emitter {
   getAddress(address)
-  const provider: JsonRpcProvider = new JsonRpcProvider('https://polygon-rpc.com')
-  signer.connect(provider)
   return EmitterFactory.connect(address, signer)
 }
 
