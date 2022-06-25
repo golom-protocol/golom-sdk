@@ -1,5 +1,5 @@
 import { isAddress } from '@ethersproject/address'
-import { JsonRpcProvider } from '@ethersproject/providers'
+import { JsonRpcSigner } from '@ethersproject/providers'
 import { toBuffer, bufferToHex, fromRpcSig } from 'ethereumjs-util'
 import { GOLOM_EXCHANGE } from '../../constants'
 import { ECSignature, SupportedChainId } from '../../types'
@@ -55,16 +55,17 @@ async function parseSignatureHex(signature: string) {
 
 /**
  * Sign messages using web3 signTypedData signatures
- * @param provider Web3 provider
+ * @param signer Web3 signer
  * @param message message to sign
  * @param signerAddress web3 address signing the message
  * @returns A signature if provider can sign, otherwise null
  */
 // eslint-disable-next-line import/prefer-default-export
 export async function signTypedDataAsync(
-  provider: JsonRpcProvider,
+  signer: JsonRpcSigner,
   message: any,
-  signerAddress: string
+  signerAddress: string,
+  overrides: { offline?: boolean } = {}
 ): Promise<ECSignature> {
   if (!isAddress(signerAddress)) throw new Error(`Not a valid signerAddress: ${signerAddress}`)
 
@@ -76,12 +77,17 @@ export async function signTypedDataAsync(
   const stringified = JSON.stringify({ message, domain, primaryType, types })
 
   try {
+    if (overrides.offline) {
+      return await signer._signTypedData(domain, types, message).then(callback)
+    }
     // Using sign typed data V4 works with a stringified message, used by browser providers i.e. Metamask
-    return await provider.send('eth_signTypedData_v4', [signerAddress, stringified]).then(callback)
+    return await signer.provider.send('eth_signTypedData_v4', [signerAddress, stringified]).then(callback)
   } catch (error) {
     console.log(error)
     // Fallback to normal sign typed data for node providers, without using stringified message
     // https://github.com/coinbase/coinbase-wallet-sdk/issues/60
-    return provider.send('eth_signTypedData', [signerAddress, { message, domain, primaryType, types }]).then(callback)
+    return signer.provider
+      .send('eth_signTypedData', [signerAddress, { message, domain, primaryType, types }])
+      .then(callback)
   }
 }

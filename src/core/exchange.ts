@@ -29,7 +29,8 @@ export async function createOrder(
     traitRoot = NULL_ROOT,
     deadline = DEFAULT_DEADLINE
   }: OrderParams,
-  signer: JsonRpcSigner
+  signer: JsonRpcSigner,
+  overrides: { offline?: boolean } = {}
 ): Promise<SignedOrder | null> {
   const exchangeContract = getExchangeContract(GOLOM_EXCHANGE, signer.provider)
   const accountAddress = await signer.getAddress()
@@ -64,7 +65,7 @@ export async function createOrder(
     deadline: Number(deadline)
   }
 
-  const ecSignature = await signTypedDataAsync(signer.provider, order, accountAddress)
+  const ecSignature = await signTypedDataAsync(signer, order, accountAddress, { offline: overrides.offline })
   const signedOrder = { ...order, ...ecSignature }
 
   try {
