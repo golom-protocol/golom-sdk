@@ -1,7 +1,7 @@
 import { Overrides } from '@ethersproject/contracts'
 import { BigNumber } from '@ethersproject/bignumber'
 import { AddressZero, One, Zero } from '@ethersproject/constants'
-import { JsonRpcProvider, JsonRpcSigner, TransactionResponse } from '@ethersproject/providers'
+import { JsonRpcProvider, TransactionResponse } from '@ethersproject/providers'
 
 import { DEFAULT_DEADLINE, EXCHANGE_FEE_ADDRESS, GOLOM_EXCHANGE, NULL_ROOT, WETH_CONTRACT } from '../constants'
 import { getExchangeContract, getErc721Contract, getErc1155Contract, getWethContract } from '../contracts'
@@ -12,7 +12,8 @@ import { signTypedDataAsync } from './sign'
 /**
  *
  * @param {OrderParams} order Order params
- * @param signer Signer object to sign the transaction
+ * @param accountAddress transaction callee
+ * @param provider Provider
  * @returns {SignedOrder} Signed Order
  */
 export async function createOrder(
@@ -29,10 +30,11 @@ export async function createOrder(
     traitRoot = NULL_ROOT,
     deadline = DEFAULT_DEADLINE
   }: OrderParams,
-  signer: JsonRpcSigner
+  accountAddress: string,
+  provider: JsonRpcProvider
 ): Promise<SignedOrder | null> {
-  const exchangeContract = getExchangeContract(GOLOM_EXCHANGE, signer.provider)
-  const accountAddress = await signer.getAddress()
+  const signer = provider.getSigner(accountAddress)
+  const exchangeContract = getExchangeContract(GOLOM_EXCHANGE, signer)
   const nonce = await exchangeContract.nonces(accountAddress)
   let orderType = 0
 
@@ -64,7 +66,7 @@ export async function createOrder(
     deadline: Number(deadline)
   }
 
-  const ecSignature = await signTypedDataAsync(signer.provider, order, accountAddress)
+  const ecSignature = await signTypedDataAsync(signer, order)
   const signedOrder = { ...order, ...ecSignature }
 
   try {
@@ -89,15 +91,18 @@ export async function createOrder(
 /**
  *
  * @param {SignedOrder} order Signed Order
- * @param signer Signer object to sign the transaction
+ * @param accountAddress transaction callee
+ * @param provider Provider
  * @param overrides Additional transaction params
  * @returns {TransactionResponse} Transaction response
  */
 export async function cancelOrder(
   order: SignedOrder,
-  signer: JsonRpcSigner,
+  accountAddress: string,
+  provider: JsonRpcProvider,
   overrides: Overrides = {}
 ): Promise<TransactionResponse> {
+  const signer = provider.getSigner(accountAddress)
   const exchangeContract = getExchangeContract(GOLOM_EXCHANGE, signer)
   return exchangeContract.cancelOrder(order, overrides)
 }
@@ -184,7 +189,8 @@ async function validateAskOrder({
 /**
  *
  * @param {FillOrderParams} params FillOrder params
- * @param signer Signer object to sign the transaction
+ * @param accountAddress transaction callee
+ * @param provider Provider
  * @param overrides Additional transaction params
  * @returns {TransactionResponse} Transaction response
  */
@@ -199,11 +205,12 @@ export async function fillOrder(
       paymentAddress: AddressZero
     }
   }: FillOrderParams,
-  signer: JsonRpcSigner,
+  accountAddress: string,
+  provider: JsonRpcProvider,
   overrides: Overrides = {}
 ): Promise<TransactionResponse | undefined> {
+  const signer = provider.getSigner(accountAddress)
   const exchangeContract = getExchangeContract(GOLOM_EXCHANGE, signer)
-  const accountAddress = await signer.getAddress()
   let orderResponse
 
   try {
@@ -246,7 +253,8 @@ export async function fillOrder(
 /**
  *
  * @param {FillCriteriaBidParams} params FillCriteriaBid params
- * @param signer Signer object to sign the transaction
+ * @param accountAddress transaction callee
+ * @param provider Provider
  * @param overrides Additional transaction params
  * @returns {TransactionResponse} Transaction response
  */
@@ -262,11 +270,12 @@ export async function fillCriteriaBid(
       paymentAddress: AddressZero
     }
   }: FillCriteriaBidParams,
-  signer: JsonRpcSigner,
+  accountAddress: string,
+  provider: JsonRpcProvider,
   overrides: Overrides = {}
 ): Promise<TransactionResponse | undefined> {
+  const signer = provider.getSigner(accountAddress)
   const exchangeContract = getExchangeContract(GOLOM_EXCHANGE, signer)
-  const accountAddress = await signer.getAddress()
   let orderResponse
 
   try {

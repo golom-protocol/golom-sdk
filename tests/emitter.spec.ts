@@ -1,16 +1,21 @@
 /* eslint-disable no-undef */
-import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers'
 import { parseUnits } from '@ethersproject/units'
-import { Wallet } from '@ethersproject/wallet'
+import { Web3Provider } from '@ethersproject/providers'
+import HDWalletProvider from '@truffle/hdwallet-provider'
 import { emitOrder } from '../src'
 
 import 'dotenv/config'
 
-const provider = new JsonRpcProvider('https://polygon-rpc.com/')
-const wallet = (new Wallet(process.env.EMITTER_ACC_PVT_KEY!, provider) as unknown) as JsonRpcSigner
+const hdWalletProvider = new HDWalletProvider({
+  privateKeys: [process.env.EMITTER_ACC_PVT_KEY!],
+  providerOrUrl: 'https://polygon-rpc.com/'
+})
+
+const provider = new Web3Provider(hdWalletProvider)
 
 describe('#emitter', () => {
   it('emitOrder', async () => {
+    const accountAddress = hdWalletProvider.getAddress()
     const tx = await emitOrder(
       {
         collection: '0xf8d4fef9af82de6e57f6aabafd49ff9730242d75',
@@ -37,7 +42,8 @@ describe('#emitter', () => {
         r: '0x3e0de926cdfcdfe542cdfbe2b9b80a431d9013b6f0f1c937cd9af87999d01c12',
         s: '0x59061c57be08c48320eca6b31b883bbe5dd80210d7f415b7095aef9dba3f96c5'
       },
-      wallet,
+      accountAddress,
+      provider,
       { maxFeePerGas: parseUnits('200', 'gwei'), maxPriorityFeePerGas: parseUnits('200', 'gwei') }
     )
 

@@ -1,6 +1,6 @@
 {
   "name": "@golom/sdk",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "dist/src/index.cjs.js",
   "module": "dist/src/index.esm.js",
   "types": "dist/src/index.d.ts",
@@ -45,6 +45,7 @@
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-typescript": "^8.3.2",
+    "@truffle/hdwallet-provider": "2.0.10-alpha.2",
     "@types/jest": "^27.5.0",
     "@typescript-eslint/eslint-plugin": "^2.2.0",
     "@typescript-eslint/parser": "^2.2.0",

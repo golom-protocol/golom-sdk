@@ -28,12 +28,6 @@ export const getCreateOrderTypedData = (
   }
 
   const types: Record<string, Array<TypedDataField>> = {
-    EIP712Domain: [
-      { name: 'name', type: 'string' },
-      { name: 'version', type: 'string' },
-      { name: 'chainId', type: 'uint256' },
-      { name: 'verifyingContract', type: 'address' }
-    ],
     payment: [
       { name: 'paymentAmt', type: 'uint256' },
       { name: 'paymentAddress', type: 'address' }
