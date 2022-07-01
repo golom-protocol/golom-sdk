@@ -14,7 +14,7 @@ This sdk contains collection of functions to interact with golom's smart contrac
         * [___fillCriteriaBid___](#3-fillCriteriaBid)
         * [___cancelOrder___](#4-cancelOrder)
     * [___Emitter___](#Emitter)
-    * [___Signing with custom provider___](#)
+    * [___Signing with custom provider___](#Signing-with-custom-provider)
 * [___Types___](#Types)
     * [___SignedOrder___](#SignedOrder)
 
