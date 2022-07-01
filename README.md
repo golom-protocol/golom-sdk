@@ -14,6 +14,7 @@ This sdk contains collection of functions to interact with golom's smart contrac
         * [___fillCriteriaBid___](#3-fillCriteriaBid)
         * [___cancelOrder___](#4-cancelOrder)
     * [___Emitter___](#Emitter)
+    * [___Signing with custom provider___](#)
 * [___Types___](#Types)
     * [___SignedOrder___](#SignedOrder)
 
@@ -35,7 +36,8 @@ npm install @golom/sdk
 | param | type | 
 | -------- | -------- 
 | order     | [OrderParams](https://github.com/golom-protocol/golom-sdk/blob/main/src/types.ts#L20) 
-| signer     | [JsonRpcSigner](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) 
+| accountAddress     | String
+| provider     | [JsonRpcProvider](https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts#L354) 
 
 
 ```typescript
@@ -44,7 +46,6 @@ import { parseEther } from '@ethersproject/units';
 import { createOrder } from '@golom/sdk';
 
 const provider = new Web3Provider(YOUR_WEB3_PROVIDER);
-const signer = provider.getSigner(SIGNER_ADDRESS);
 
 // returns SignedOrder
 let order = await createOrder(
@@ -56,14 +57,16 @@ let order = await createOrder(
         },
         listingPrice: parseEther("1")
     },
-    signer
+    accountAddress,
+    provider
 )
 ```
 #### 2. `fillOrder()`
 | param | type | default | required
 | -------- | -------- | -------- | --------
 | orderParams     | [FillOrderParams](https://github.com/golom-protocol/golom-sdk/blob/main/src/types.ts#L34) ||true
-| signer     | [JsonRpcSigner](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
+| accountAddress     | String || true
+| provider     | [JsonRpcProvider](https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts#L354) || true
 | overrides     | [Overrides](https://github.com/ethers-io/ethers.js/blob/master/packages/contracts/src.ts/index.ts#L17) | `{}` | false
 
 ```typescript
@@ -77,7 +80,8 @@ const signer = provider.getSigner(SIGNER_ADDRESS);
 // returns TransactionResponse
 await fillOrder(
     signedOrder, // returned from createOrder() function
-    signer
+    accountAddress,
+    provider
 )
 ```
 
@@ -85,7 +89,8 @@ await fillOrder(
 | param | type | default | required
 | -------- | -------- | -------- | --------
 | orderParams     | [FillCriteriaBidParams](https://github.com/golom-protocol/golom-sdk/blob/main/src/types.ts#L42) ||true
-| signer     | [JsonRpcSigner](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
+| accountAddress     | String || true
+| provider     | [JsonRpcProvider](https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts#L354) || true
 | overrides     | [Overrides](https://github.com/ethers-io/ethers.js/blob/master/packages/contracts/src.ts/index.ts#L17) | `{}` | false
 
 
@@ -103,7 +108,8 @@ await fillCriteriaBid(
         order: signedOrder, // returned from createOrder() function
         tokenId: 1
     }, 
-    signer
+    accountAddress,
+    provider
 )
 ```
 
@@ -111,7 +117,8 @@ await fillCriteriaBid(
 | param | type | default | required
 | -------- | -------- | -------- | --------
 | order     | [SignedOrder](#SignedOrder) ||true
-| signer     | [JsonRpcSigner](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
+| accountAddress     | String || true
+| provider     | [JsonRpcProvider](https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts#L354) || true
 | overrides     | [Overrides](https://github.com/ethers-io/ethers.js/blob/master/packages/contracts/src.ts/index.ts#L17) | `{}` | false
 
 
@@ -126,7 +133,8 @@ const signer = provider.getSigner(SIGNER_ADDRESS);
 // returns TransactionResponse
 await cancelOrder(
     signedOrder, // returned from createOrder() function
-    signer
+    accountAddress,
+    provider
 )
 ```
 <a name="usage-emitter"></a>
@@ -137,7 +145,8 @@ Emits signed order to polygon blockchain.
 | param | type | default | required
 | -------- | -------- | -------- | --------
 | order     | [SignedOrder](#SignedOrder) ||true
-| signer     | [JsonRpcSigner](https://github.com/ethers-io/ethers.js/blob/master/packages/abstract-signer/src.ts/index.ts#L58) || true
+| accountAddress     | String || true
+| provider     | [JsonRpcProvider](https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts#L354) || true
 | overrides     | [Overrides](https://github.com/ethers-io/ethers.js/blob/master/packages/contracts/src.ts/index.ts#L17) | `{}` | false
 
 ```typescript
@@ -151,9 +160,44 @@ const signer = provider.getSigner(SIGNER_ADDRESS);
 // returns TransactionResponse
 await emitOrder(
     signedOrder, // returned from createOrder() function
-    signer
+    accountAddress,
+    provider
 )
 ```
+### Signing with custom provider
+
+```typescript
+import { Web3Provider } from '@ethersproject/providers';
+import HDWalletProvider from '@truffle/hdwallet-provider';
+import { parseEther } from '@ethersproject/units';
+import { createOrder } from '@golom/sdk';
+
+import 'dotenv/config';
+
+const hdWalletProvider = new HDWalletProvider({
+  privateKeys: [process.env.PRIVATE_KEY!],
+  providerOrUrl: process.env.RPC_URL
+});
+
+const provider = new Web3Provider(hdWalletProvider);
+
+async function createMyOrder() {
+    const accountAddress = hdWalletProvider.getAddress();
+    
+    const signedOrder = await createOrder( {
+        asset: {
+        tokenId: 1,
+        collection: SOME_COLLECTION_ADDRESS,
+        schema: "ERC721" // "ERC721" or "ERC1155"
+        },
+        listingPrice: parseEther("1")
+    }, accountAddress, provider);
+    
+    return signedOrder;
+}
+```
+> NOTE: we've used `2.0.10-alpha.2` version for `@truffle/hdwallet-provider`
+
 ## Types
 For more details on type: [visit here](https://github.com/golom-protocol/golom-sdk/blob/main/src/types.ts)
 ### SignedOrder
