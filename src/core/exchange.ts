@@ -33,8 +33,6 @@ export async function createOrder(
   accountAddress: string,
   provider: JsonRpcProvider
 ): Promise<SignedOrder | null> {
-  console.log({ accountAddress })
-
   const signer = provider.getSigner(accountAddress)
   const exchangeContract = getExchangeContract(GOLOM_EXCHANGE, signer)
   const nonce = await exchangeContract.nonces(accountAddress)
