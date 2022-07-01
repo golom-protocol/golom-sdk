@@ -33,5 +33,10 @@ export default {
       banner
     }
   ],
-  plugins: [typescript(), json()]
+  plugins: [
+    typescript({
+      exclude: ['tests/*.spec.ts']
+    }),
+    json()
+  ]
 }
